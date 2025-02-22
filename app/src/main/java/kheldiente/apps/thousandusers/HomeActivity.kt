@@ -13,16 +13,24 @@ import kheldiente.apps.thousandusers.ui.screen.UserListScreen
 import kheldiente.apps.thousandusers.ui.theme.ThousandUsersTheme
 
 class HomeActivity : ComponentActivity() {
+
+    private val userViewModel by lazy {
+        applicationContext.appDependencies().getUserListViewModel()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            ThousandUsersTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    UserListScreen(
-                        viewModel = applicationContext.appDependencies().getUserListViewModel(),
-                        modifier = Modifier.padding(innerPadding),
-                    )
+
+        userViewModel.setupDataIfNeeded {
+            setContent {
+                ThousandUsersTheme {
+                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                        UserListScreen(
+                            viewModel = userViewModel,
+                            modifier = Modifier.padding(innerPadding),
+                        )
+                    }
                 }
             }
         }

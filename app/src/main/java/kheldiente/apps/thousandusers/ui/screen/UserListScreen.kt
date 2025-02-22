@@ -13,11 +13,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kheldiente.apps.thousandusers.data.model.User
-import kheldiente.apps.thousandusers.viewmodel.UserListViewModel
+import kheldiente.apps.thousandusers.viewmodel.UserViewModel
 
 @Composable
 fun UserListScreen(
-    viewModel: UserListViewModel,
+    viewModel: UserViewModel,
     modifier: Modifier = Modifier,
 ) {
     val users = viewModel.getUsers()
@@ -40,7 +40,6 @@ fun UserListItem(user: User) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-
     ) {
         Column(
             modifier = Modifier.padding(8.dp)
@@ -51,7 +50,17 @@ fun UserListItem(user: User) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = user.email,
+                text = "Email: ${user.email}",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Gender: ${user.gender}",
+                style = MaterialTheme.typography.bodySmall,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "Status: ${if (user.status) "Active" else "Inactive"}",
                 style = MaterialTheme.typography.bodySmall,
             )
         }

@@ -1,9 +1,13 @@
 package kheldiente.apps.thousandusers.util
 
 import android.content.Context
+import com.google.gson.Gson
+import kheldiente.apps.thousandusers.data.model.User
 
-fun Context.readTextFromAsset(fileName : String): String {
-    return assets.open(fileName).bufferedReader().use {
+fun Context.readUsersFromJsonFile(): List<User> {
+    val fileName = "thousand_users.json"
+    val jsonString = assets.open(fileName).bufferedReader().use {
         it.readText()
     }
+    return Gson().fromJson(jsonString, Array<User>::class.java).toList()
 }

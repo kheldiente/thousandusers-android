@@ -5,6 +5,6 @@ import kheldiente.apps.thousandusers.di.AppDependencies
 
 class ThousandUserApplication: Application() {
 
-    val appDependencies by lazy { AppDependencies() }
+    val appDependencies by lazy { AppDependencies(applicationContext) }
 
 }
