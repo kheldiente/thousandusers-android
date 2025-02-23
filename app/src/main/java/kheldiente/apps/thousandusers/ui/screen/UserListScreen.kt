@@ -31,6 +31,7 @@ fun UserListScreen(
     val uiState = viewModel.uiState.collectAsState()
     val users = uiState.value.users
     val isLoading = uiState.value.isLoading
+    val isLoadingMoreUsers = uiState.value.isLoadingMoreUsers
     val hasMoreUsers = uiState.value.hasMoreUsers
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -48,9 +49,24 @@ fun UserListScreen(
                 ) { index ->
                     UserListItem(users[index])
 
+                    // For now, we will just load more users when we reach the last item
+                    // IMPROVEMENT: Load more users when we reach the 3rd last item in the list (prefetching)
                     if (index == users.lastIndex && hasMoreUsers) {
                         LaunchedEffect(Unit) {
                             viewModel.loadMoreUsers()
+                        }
+                    }
+                }
+
+                if (isLoadingMoreUsers) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
                         }
                     }
                 }

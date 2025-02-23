@@ -32,13 +32,23 @@ class UserViewModel(
     }
 
     fun loadMoreUsers() {
-        if (_uiState.value.hasMoreUsers.not()) {
+        val isLoadingMoreUsers = _uiState.value.isLoadingMoreUsers
+        val hasMoreUsers = _uiState.value.hasMoreUsers
+
+        if (isLoadingMoreUsers || !hasMoreUsers) {
             return
         }
 
         viewModelScope.launch {
             try {
+                _uiState.update { currentState ->
+                    currentState.copy(isLoadingMoreUsers = true)
+                }
+
                 currentPage++
+
+                // Added to simulate loading delay
+                delay(DELAY_TO_SHOW_LIST)
 
                 val nextUsers = userDataSource.getUsers(
                     limit = PAGE_LIMIT,
@@ -50,20 +60,19 @@ class UserViewModel(
                         val newUserList = currentState.users + nextUsers
                         currentState.copy(
                             users = newUserList,
-                            hasMoreUsers = newUserList.size < maxUserCount
+                            hasMoreUsers = newUserList.size < maxUserCount,
                         )
                     }
                 } else {
                     _uiState.update { currentState ->
                         currentState.copy(
-                            isLoading = false,
                             hasMoreUsers = false
                         )
                     }
                 }
             } finally {
                 _uiState.update { currentState ->
-                    currentState.copy(isLoading = false)
+                    currentState.copy(isLoadingMoreUsers = false)
                 }
             }
         }
@@ -77,6 +86,7 @@ class UserViewModel(
         currentPage = INIT_PAGE
         maxUserCount = userDataSource.getUserCount()
 
+        // Added to simulate loading delay
         delay(DELAY_TO_SHOW_LIST)
 
         userDataSource.getUsers(
