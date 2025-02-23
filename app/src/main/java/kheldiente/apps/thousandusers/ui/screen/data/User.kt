@@ -1,4 +1,4 @@
-package kheldiente.apps.thousandusers.data.model
+package kheldiente.apps.thousandusers.ui.screen.data
 
 import com.google.gson.annotations.SerializedName
 

@@ -2,7 +2,7 @@ package kheldiente.apps.thousandusers.util
 
 import android.content.Context
 import com.google.gson.Gson
-import kheldiente.apps.thousandusers.data.model.User
+import kheldiente.apps.thousandusers.ui.screen.data.User
 
 fun Context.readUsersFromJsonFile(): List<User> {
     val fileName = "thousand_users.json"

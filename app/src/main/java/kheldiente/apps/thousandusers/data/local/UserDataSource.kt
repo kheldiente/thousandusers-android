@@ -1,8 +1,8 @@
 package kheldiente.apps.thousandusers.data.local
 
-import kheldiente.apps.thousandusers.data.model.User
+import kheldiente.apps.thousandusers.ui.screen.data.User
 
 interface UserDataSource {
     suspend fun setup()
-    fun getUsers(limit: Int, offset: Int): List<User>
+    suspend fun getUsers(limit: Int, offset: Int): List<User>
 }

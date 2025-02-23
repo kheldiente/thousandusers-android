@@ -7,4 +7,9 @@ class ThousandUserApplication: Application() {
 
     val appDependencies by lazy { AppDependencies(applicationContext) }
 
+    override fun onCreate() {
+        super.onCreate()
+        appDependencies.initDb()
+    }
+
 }

@@ -21,16 +21,13 @@ class HomeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        userViewModel.setupDataIfNeeded {
-            setContent {
-                ThousandUsersTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        UserListScreen(
-                            viewModel = userViewModel,
-                            modifier = Modifier.padding(innerPadding),
-                        )
-                    }
+        setContent {
+            ThousandUsersTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    UserListScreen(
+                        viewModel = userViewModel,
+                        modifier = Modifier.padding(innerPadding),
+                    )
                 }
             }
         }
