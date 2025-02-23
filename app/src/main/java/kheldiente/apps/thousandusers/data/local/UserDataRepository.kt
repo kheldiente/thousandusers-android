@@ -12,7 +12,7 @@ class UserDataRepository(
     private val userDao: UserDao
 ): UserDataSource {
 
-    override suspend fun setup() {
+    override suspend fun populateDatabaseIfNeeded() {
         if (shouldPopulateDb()) {
             val users = context.readUsersFromJsonFile()
                 .map { it.toUserEntity() }
@@ -27,6 +27,10 @@ class UserDataRepository(
     override suspend fun getUsers(limit: Int, offset: Int): List<User> {
         return userDao.getUsers(limit, offset)
             .map { it.toUserViewData() }
+    }
+
+    override suspend fun getUserCount(): Int {
+        return userDao.getUserCount()
     }
 
     private suspend fun shouldPopulateDb(): Boolean {

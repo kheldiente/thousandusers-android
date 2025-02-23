@@ -3,9 +3,11 @@ package kheldiente.apps.thousandusers.ui.screen.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kheldiente.apps.thousandusers.ui.screen.data.User
 import kheldiente.apps.thousandusers.data.local.UserDataSource
 import kheldiente.apps.thousandusers.ui.screen.UserListUiState
+import kheldiente.apps.thousandusers.util.DELAY_TO_SHOW_LIST
+import kheldiente.apps.thousandusers.util.INIT_PAGE
+import kheldiente.apps.thousandusers.util.PAGE_LIMIT
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,41 +18,76 @@ class UserViewModel(
     private val userDataSource: UserDataSource,
 ): ViewModel() {
 
-    companion object {
-        private const val PAGINATION_LIMIT = 20
-        private const val PAGINATION_OFFSET = 0
-        private const val DELAY_TO_SHOW_LOADING = 500L
-    }
-
-    private val _uiState = MutableStateFlow(UserListUiState())
+    private val _uiState = MutableStateFlow(UserListUiState(isLoading = true))
     val uiState = _uiState.asStateFlow()
+
+    private var currentPage = INIT_PAGE
+    private var maxUserCount = 0
 
     init {
         viewModelScope.launch {
-            _uiState.value = UserListUiState(isLoading = true)
+            populateDatabaseIfNeeded()
+            loadInitData()
+        }
+    }
+
+    fun loadMoreUsers() {
+        if (_uiState.value.hasMoreUsers.not()) {
+            return
+        }
+
+        viewModelScope.launch {
             try {
-                // Added delay just to show that loading is working
-                delay(DELAY_TO_SHOW_LOADING)
-                userDataSource.setup()
+                currentPage++
+
+                val nextUsers = userDataSource.getUsers(
+                    limit = PAGE_LIMIT,
+                    offset = currentPage * PAGE_LIMIT
+                )
+
+                if (nextUsers.isNotEmpty()) {
+                    _uiState.update { currentState ->
+                        val newUserList = currentState.users + nextUsers
+                        currentState.copy(
+                            users = newUserList,
+                            hasMoreUsers = newUserList.size < maxUserCount
+                        )
+                    }
+                } else {
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            hasMoreUsers = false
+                        )
+                    }
+                }
             } finally {
-                getUsers()
+                _uiState.update { currentState ->
+                    currentState.copy(isLoading = false)
+                }
             }
         }
     }
 
-    fun getUsers(
-        limit: Int = PAGINATION_LIMIT,
-        offset: Int = PAGINATION_OFFSET
-    ) {
-        viewModelScope.launch {
-            userDataSource.getUsers(limit, offset).let { users ->
-                _uiState.update {
-                    it.copy(
-                        users = users,
-                        isLoading = false
-                    )
-                }
-            }
+    private suspend fun populateDatabaseIfNeeded() {
+        userDataSource.populateDatabaseIfNeeded()
+    }
+
+    private suspend fun loadInitData() {
+        currentPage = INIT_PAGE
+        maxUserCount = userDataSource.getUserCount()
+
+        delay(DELAY_TO_SHOW_LIST)
+
+        userDataSource.getUsers(
+            limit = PAGE_LIMIT,
+            offset = currentPage * PAGE_LIMIT
+        ).let { users ->
+            _uiState.value = UserListUiState(
+                users = users,
+                hasMoreUsers = users.size < maxUserCount,
+                isLoading = false
+            )
         }
     }
 

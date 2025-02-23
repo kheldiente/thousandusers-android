@@ -13,10 +13,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kheldiente.apps.thousandusers.R
 import kheldiente.apps.thousandusers.ui.screen.data.User
 import kheldiente.apps.thousandusers.ui.screen.viewmodel.UserViewModel
 
@@ -28,6 +31,7 @@ fun UserListScreen(
     val uiState = viewModel.uiState.collectAsState()
     val users = uiState.value.users
     val isLoading = uiState.value.isLoading
+    val hasMoreUsers = uiState.value.hasMoreUsers
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
@@ -43,6 +47,12 @@ fun UserListScreen(
                     key = { index -> index }
                 ) { index ->
                     UserListItem(users[index])
+
+                    if (index == users.lastIndex && hasMoreUsers) {
+                        LaunchedEffect(Unit) {
+                            viewModel.loadMoreUsers()
+                        }
+                    }
                 }
             }
         }
@@ -60,7 +70,7 @@ fun UserListItem(user: User) {
             modifier = Modifier.padding(8.dp)
         ) {
             Text(
-                text = user.getFullName(),
+                text = "${user.getFullName()} - ID: ${user.id}",
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(4.dp))
@@ -75,7 +85,9 @@ fun UserListItem(user: User) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Status: ${if (user.status) "Active" else "Inactive"}",
+                text = """
+                    Status: ${if (user.status) stringResource(R.string.active_label) else stringResource(R.string.inactive_label)}
+                """.trimIndent(),
                 style = MaterialTheme.typography.bodySmall,
             )
         }
