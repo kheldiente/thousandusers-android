@@ -14,13 +14,17 @@ fun Context.appDependencies(): AppDependencies {
 
 class AppDependencies(private val context: Context) {
 
+    companion object {
+        private const val DB_NAME = "thousand-users-db"
+    }
+
     private lateinit var database: AppDatabase
 
     fun initDb() {
         database = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "thousand-users-db"
+            DB_NAME
         ).build()
     }
 

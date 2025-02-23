@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ThousandUsers</string>
+    <string name="inactive_label">Inactive</string>
+    <string name="active_label">Active</string>
 </resources>
