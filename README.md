@@ -1,4 +1,4 @@
-# ThousandUsers
+# ThousandUsers - Android
  Jetpack Compose app that shows thousands users
 
 # Video demo
