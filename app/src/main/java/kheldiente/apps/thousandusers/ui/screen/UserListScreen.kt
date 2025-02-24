@@ -1,5 +1,6 @@
 package kheldiente.apps.thousandusers.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,9 @@ import androidx.compose.ui.unit.dp
 import kheldiente.apps.thousandusers.R
 import kheldiente.apps.thousandusers.ui.screen.data.User
 import kheldiente.apps.thousandusers.ui.screen.viewmodel.UserViewModel
+import kheldiente.apps.thousandusers.ui.theme.Grey
+import kheldiente.apps.thousandusers.ui.theme.Typography
+import kheldiente.apps.thousandusers.ui.theme.White
 
 @Composable
 fun UserListScreen(
@@ -34,7 +38,10 @@ fun UserListScreen(
     val isLoadingMoreUsers = uiState.value.isLoadingMoreUsers
     val hasMoreUsers = uiState.value.hasMoreUsers
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .background(Grey)
+    ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
@@ -81,30 +88,40 @@ fun UserListItem(user: User) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = White,
+        )
     ) {
         Column(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 16.dp)
         ) {
             Text(
-                text = "${user.getFullName()} - ID: ${user.id}",
-                style = MaterialTheme.typography.titleMedium,
+                text = user.getFullName(),
+                style = Typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Email: ${user.email}",
-                style = MaterialTheme.typography.bodySmall,
+                text = "${stringResource(R.string.id_label)}: ${user.id}",
+                style = Typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Gender: ${user.gender}",
-                style = MaterialTheme.typography.bodySmall,
+                text = "${stringResource(R.string.email_label)}: ${user.email}",
+                style = Typography.bodyMedium,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "${stringResource(R.string.gender_label)}: ${user.gender}",
+                style = Typography.bodyMedium,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = """
-                    Status: ${if (user.status) stringResource(R.string.active_label) else stringResource(R.string.inactive_label)}
+                    ${stringResource(R.string.status_label)}: ${if (user.status) stringResource(R.string.active_label) else stringResource(R.string.inactive_label)}
                 """.trimIndent(),
-                style = MaterialTheme.typography.bodySmall,
+                style = Typography.bodyMedium,
             )
         }
     }

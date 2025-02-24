@@ -2,4 +2,8 @@
     <string name="app_name">ThousandUsers</string>
     <string name="inactive_label">Inactive</string>
     <string name="active_label">Active</string>
+    <string name="id_label">ID</string>
+    <string name="email_label">Email</string>
+    <string name="gender_label">Gender</string>
+    <string name="status_label">Status</string>
 </resources>
