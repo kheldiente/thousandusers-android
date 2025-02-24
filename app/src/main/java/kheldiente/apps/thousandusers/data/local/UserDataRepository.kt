@@ -24,17 +24,17 @@ class UserDataRepository(
         }
     }
 
-    override suspend fun getUsers(limit: Int, offset: Int): List<User> {
-        return userDao.getUsers(limit, offset)
+    override suspend fun getUsers(keyword: String, limit: Int, offset: Int): List<User> {
+        return userDao.getUsers(keyword, limit, offset)
             .map { it.toUserViewData() }
     }
 
-    override suspend fun getUserCount(): Int {
-        return userDao.getUserCount()
+    override suspend fun getUserCount(keyword: String): Int {
+        return userDao.getUserCount(keyword)
     }
 
     private suspend fun shouldPopulateDb(): Boolean {
-        return userDao.getUserCount() == 0
+        return userDao.getUserCount("") == 0
     }
 
 }

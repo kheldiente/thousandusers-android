@@ -7,4 +7,5 @@ data class UserListUiState(
     val isLoading: Boolean = false,
     val isLoadingMoreUsers: Boolean = false,
     val hasMoreUsers: Boolean = false,
+    val searchQuery: String = "",
 )

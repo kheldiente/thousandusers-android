@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kheldiente.apps.thousandusers.R
 import kheldiente.apps.thousandusers.ui.screen.data.User
+import kheldiente.apps.thousandusers.ui.screen.view.SearchField
 import kheldiente.apps.thousandusers.ui.screen.viewmodel.UserViewModel
 import kheldiente.apps.thousandusers.ui.theme.Grey
 import kheldiente.apps.thousandusers.ui.theme.Typography
@@ -37,6 +38,7 @@ fun UserListScreen(
     val isLoading = uiState.value.isLoading
     val isLoadingMoreUsers = uiState.value.isLoadingMoreUsers
     val hasMoreUsers = uiState.value.hasMoreUsers
+    val searchQuery = uiState.value.searchQuery
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -47,33 +49,53 @@ fun UserListScreen(
                 modifier = Modifier.align(Alignment.Center)
             )
         } else {
-            LazyColumn(
-                modifier = modifier.padding(8.dp)
+            Column(
+                modifier = modifier.fillMaxSize()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                items(
-                    count = users.size,
-                    key = { index -> index }
-                ) { index ->
-                    UserListItem(users[index])
+                SearchField(searchQuery, viewModel::onSearchQueryChange)
+                LazyColumn {
+                    if (users.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.no_users_found),
+                                    style = Typography.bodyMedium,
+                                )
+                            }
+                        }
+                    } else {
+                        items(
+                            count = users.size,
+                            key = { index -> index }
+                        ) { index ->
+                            UserListItem(users[index])
 
-                    // For now, we will just load more users when we reach the last item
-                    // IMPROVEMENT: Load more users when we reach the 3rd last item in the list (prefetching)
-                    if (index == users.lastIndex && hasMoreUsers) {
-                        LaunchedEffect(Unit) {
-                            viewModel.loadMoreUsers()
+                            // For now, we will just load more users when we reach the last item
+                            // IMPROVEMENT: Load more users when we reach the threshold < (size - 1) last item in the list (prefetching)
+                            if (index == users.lastIndex && hasMoreUsers) {
+                                LaunchedEffect(Unit) {
+                                    viewModel.loadMoreUsers()
+                                }
+                            }
                         }
                     }
-                }
 
-                if (isLoadingMoreUsers) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                    if (isLoadingMoreUsers) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
                         }
                     }
                 }

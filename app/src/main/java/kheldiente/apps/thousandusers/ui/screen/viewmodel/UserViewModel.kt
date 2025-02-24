@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kheldiente.apps.thousandusers.data.local.UserDataSource
 import kheldiente.apps.thousandusers.ui.screen.UserListUiState
-import kheldiente.apps.thousandusers.util.DELAY_TO_SHOW_LIST
+import kheldiente.apps.thousandusers.util.DELAY_TO_SHOW_LIST_MILLIS
 import kheldiente.apps.thousandusers.util.INIT_PAGE
 import kheldiente.apps.thousandusers.util.PAGE_LIMIT
+import kheldiente.apps.thousandusers.util.SEARCH_DELAY_MILLIS
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,8 +23,11 @@ class UserViewModel(
     private val _uiState = MutableStateFlow(UserListUiState(isLoading = true))
     val uiState = _uiState.asStateFlow()
 
+    private var searchUsersJob: Job? = null
+
     private var currentPage = INIT_PAGE
     private var maxUserCount = 0
+    private var searchQuery = ""
 
     init {
         viewModelScope.launch {
@@ -48,9 +53,10 @@ class UserViewModel(
                 currentPage++
 
                 // Added to simulate loading delay
-                delay(DELAY_TO_SHOW_LIST)
+                delay(DELAY_TO_SHOW_LIST_MILLIS)
 
                 val nextUsers = userDataSource.getUsers(
+                    keyword = searchQuery,
                     limit = PAGE_LIMIT,
                     offset = currentPage * PAGE_LIMIT
                 )
@@ -78,25 +84,44 @@ class UserViewModel(
         }
     }
 
+    fun onSearchQueryChange(query: String) {
+        currentPage = INIT_PAGE
+        searchQuery = query
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                searchQuery = query
+            )
+        }
+
+        searchUsersJob?.cancel()
+        searchUsersJob = viewModelScope.launch {
+            delay(SEARCH_DELAY_MILLIS)
+            loadInitData()
+        }
+    }
+
     private suspend fun populateDatabaseIfNeeded() {
         userDataSource.populateDatabaseIfNeeded()
     }
 
     private suspend fun loadInitData() {
         currentPage = INIT_PAGE
-        maxUserCount = userDataSource.getUserCount()
+        maxUserCount = userDataSource.getUserCount(searchQuery)
 
         // Added to simulate loading delay
-        delay(DELAY_TO_SHOW_LIST)
+        delay(DELAY_TO_SHOW_LIST_MILLIS)
 
         userDataSource.getUsers(
+            keyword = searchQuery,
             limit = PAGE_LIMIT,
             offset = currentPage * PAGE_LIMIT
         ).let { users ->
             _uiState.value = UserListUiState(
                 users = users,
                 hasMoreUsers = users.size < maxUserCount,
-                isLoading = false
+                isLoading = false,
+                searchQuery = searchQuery
             )
         }
     }

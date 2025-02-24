@@ -6,4 +6,8 @@
     <string name="email_label">Email</string>
     <string name="gender_label">Gender</string>
     <string name="status_label">Status</string>
+    <string name="search_hint">Search user(s) by name…</string>
+    <string name="search_icon_description">Search</string>
+    <string name="clear_icon_description">Clear search</string>
+    <string name="no_users_found">No users found!</string>
 </resources>
